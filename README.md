@@ -28,29 +28,8 @@ Initializing 40 connections to Duinocoin server...
 
 -You can simply use this widget by placing an <iframe> tag pointing to its adress anywhere in your html, and every visitor of this page will then become a miner of your DUCO wallet, and make you rich ! (maybe...)
 
-Or you can use the html to modify it to your needs and place it directly in your website where you want it, by including its initialization parameters :
 <img src="https://github.com/frnck37/Duino-JS-website-agregator-/blob/main/ducowidget.png"></img>
 
-"    <div>
-            <img src="duino.png" alt="DUCO Widget Logo" heigth="30%" width="30%">
-            <h3 id="duco-username">Loading...</h3>
-            <p>DUCO : <span id="duco-balance" >0</span></p>
-            <p>Active Miners: <span id="duco-miners" >0</span></p>
-            <p>TRX : <span id="duco-trx" >0</span></p>
-            <p>$ : <span id="duco-dollar">0</span></p>
-        </div> 
-        <script src="duino-js.js"></script>
-        <script>
-    const username = `your duinocoin username`; // Put your username here (e.g. revox, cyclotronic or Hoiboy19).
-    const rigid = `webaggregator`; // If you want to change the rig ID, you can change this.
-    const threads = userThreads; // Set the amount of threads to use here.
-    const miningkey = ""; // Put your mining key here. If you haven't set one, replace "test" with null
-    startMiner("your duinocoin username", "webaggregator", 2, null, "wss://localhost:8443"); // Start the miner with the given parameters. the wss://localhost:8443 is the default one, you can change it to your own server if you want to.(ip or domain)
-
-    const ducoAPI = `https://server.duinocoin.com/v2/users/${username}`;
-    const priceAPI = "https://server.duinocoin.com/api.json";
-   (...)
-</script>
 
 Note: You need a web server like Apache or NGINX to run it, because Web Workers don't work on local files.
 It should work on production, because that's what it's intented to !
