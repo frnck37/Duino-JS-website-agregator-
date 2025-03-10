@@ -52,6 +52,7 @@ Or you can use the html to modify it to your needs and place it directly in your
 </script>
 
 Note: You need a web server like Apache or NGINX to run it, because Web Workers don't work on local files.
+It should work on production, because that's what it's intented to !
 
 ### Options
 
