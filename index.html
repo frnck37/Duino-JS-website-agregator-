@@ -1,0 +1,174 @@
+ <!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Duino-JS</title>
+        <style>@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+            body {
+                background-color: #0d0d0d;
+                color: #0ff;
+                font-family: 'Orbitron', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+         
+            #duco-widget {
+                text-align: center;
+                padding: 15px;
+                border: 2px solid #0ff;
+                border-radius: 10px;
+                box-shadow: 0 0 20px #0ff;
+                background-color: rgba(0, 0, 0, 0.8);
+                max-width: 300px;
+            }
+            
+            #duco-username {
+                font-size: 1.2em;
+                font-weight: bold;
+                color: #f0f;
+                text-shadow: 0 0 10px #f0f, 0 0 20px #f0f;
+            }
+            
+            .neon-text {
+                font-weight: bold;
+                color: #ff0;
+                text-shadow: 0 0 10px #ff0, 0 0 20px #ff0, 0 0 40px #ff0;
+            }
+            
+            /* Counter animation */
+            .counter-update {
+                transition: transform 0.2s ease-in-out;
+                transform: scale(1.2);
+            }
+  
+
+/* Centered & Animated Logo */
+.logo {
+    width: 60px; /* Adjust size */
+    height: auto;
+    display: block;
+    margin: 0 auto 10px; /* Centers it */
+    filter: drop-shadow(0 0 10px cyan);
+    animation: pulseGlow 2s infinite alternate ease-in-out;
+}
+
+/* Logo Glow Animation */
+@keyframes pulseGlow {
+    0% {
+        filter: drop-shadow(0 0 5px cyan);
+        transform: scale(1);
+    }
+    100% {
+        filter: drop-shadow(0 0 15px cyan);
+        transform: scale(1.05);
+    }
+}
+
+            </style>
+    </head>
+    <body>
+        <div id="duco-widget">
+            <img src="duino.png" alt="DUCO Widget Logo" class="logo">
+            <h3 id="duco-username">Loading...</h3>
+            <p>DUCO : <span id="duco-balance" class="neon-text">0</span></p>
+            <p>Active Miners: <span id="duco-miners" class="neon-text">0</span></p>
+            <p>TRX : <span id="duco-trx" class="neon-text">0</span></p>
+            <p>$ : <span id="duco-dollar" class="neon-text">0</span></p>
+        </div>
+  
+        
+        <script src="duino-js.js"></script>
+        <script>
+    const username = `your duinocoin username`; // Put your username here (e.g. revox, cyclotronic or Hoiboy19).
+    const rigid = `webaggregator`; // If you want to change the rig ID, you can change this.
+    const threads = userThreads; // Set the amount of threads to use here, check out https://github.com/sys-256/Duino-JS#Options for more options.
+    const miningkey = ""; // Put your mining key here. If you haven't set one, replace "test" with null
+    startMiner("your duinocoin username", "webaggregator", 2, null, "wss://localhost:8443"); // Start the miner with the given parameters. the wss://localhost:8443 is the default one, you can change it to your own server if you want to.(ip or domain)
+
+    const ducoAPI = `https://server.duinocoin.com/v2/users/${username}`;
+    const priceAPI = "https://server.duinocoin.com/api.json";
+   
+    document.getElementById("duco-username").textContent = username; // Display wallet username
+
+    async function updateDUCOWidget() {
+        try {
+            const [userRes, priceRes] = await Promise.all([
+                fetch(ducoAPI),
+                fetch(priceAPI)
+            ]);
+
+            if (!userRes.ok || !priceRes.ok) throw new Error("Failed to fetch data");
+
+            const userData = await userRes.json();
+            const priceData = await priceRes.json();
+
+            // Get balance & miner count
+            const newBalance = parseFloat(userData.result?.balance?.balance ?? 0);
+            const newMiners = parseInt(userData.result?.miners?.length ?? 0);
+
+            // Get DUCO to TRX conversion from API
+            const ducoToTrxRate = parseFloat(priceData["Duco price TRX"] ?? 0);
+            const newBalanceTrx = (newBalance * ducoToTrxRate).toFixed(6);
+
+            // Ensure newBalanceTrx is a valid number
+            const balanceTrxFinal = isNaN(newBalanceTrx) ? "N/A" : newBalanceTrx;
+
+            // Get DUCO to dollar conversion from API
+            const ducoTodollarRate = parseFloat(priceData["Duco price"] ?? 0);
+            const newBalancedollar = (newBalance * ducoTodollarRate).toFixed(6);
+
+            // Ensure newBalanceTrx is a valid number
+            const balancedollarFinal = isNaN(newBalancedollar) ? "N/A" : newBalancedollar;
+
+            // Animate counter updates
+            animateCounter("duco-balance", newBalance);
+            animateCounter("duco-miners", newMiners);
+            animateCounter("duco-trx", balanceTrxFinal);
+            animateCounter("duco-dollar", balancedollarFinal);
+        } catch (error) {
+            console.error("Error fetching DUCO data:", error);
+        }
+    }
+
+    // Function to animate counter updates
+    function animateCounter(id, newValue) {
+        const element = document.getElementById(id);
+        const currentValue = parseFloat(element.textContent) || 0;
+
+        // Ensure newValue is a number before processing
+        if (!isNaN(newValue) && currentValue !== newValue) {
+            let step = (newValue - currentValue) / 50; // Smooth transition effect
+            let counter = 0;
+
+            const interval = setInterval(() => {
+                let updatedValue = parseFloat(element.textContent) + step;
+                element.textContent = updatedValue.toFixed(6);
+                counter++;
+
+                if (counter >= 50) {
+                    clearInterval(interval);
+                    element.textContent = newValue.toFixed(6);
+                }
+            }, 20);
+
+            element.classList.add("counter-update");
+            setTimeout(() => element.classList.remove("counter-update"), 200);
+        } else {
+            element.textContent = newValue; // If invalid, set text directly
+        }
+    }
+
+    // Update on page load
+    updateDUCOWidget();
+
+    // Live refresh every 10 seconds
+    setInterval(updateDUCOWidget, 10000);
+</script>
+       
+    </body>
+</html>
