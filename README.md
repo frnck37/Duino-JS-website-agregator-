@@ -11,7 +11,16 @@ To use the miner:
 
 -change "your duinocoin username" and "webaggregator" in the "index.html", "duino-js.js" and "server.js" file to your wishes.
 
--Download all the files to your server folder (call it "duinocoin" for example).
+-Download all the files to your server folder (call it "duinocoin" for example). In this folder, open your terminal, and type :
+" openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout selfsigned.key -out selfsigned.crt", that will install a self signed certificate for SSL connection to your websocket server.
+
+-In the same folder, run "npm server.js". You should see the indications that ther server is running on port :8443:
+
+"bash-5.1$ node server.js
+WebSocket server is listening on port 8443
+HTTPS server is listening on port 8443
+Initializing 40 connections to Duinocoin server...
+"
 
 - Navigate to "http://yourserver.com/duinocoin", and you should see a widget showing your DUCO username, your DUCO balance, the active miners working for you, the value of your wallet in TRON (TRX) and an approximation of its value in $.
 
